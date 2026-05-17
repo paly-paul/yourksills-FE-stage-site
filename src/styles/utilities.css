@@ -1,0 +1,101 @@
+@layer utilities {
+  .text-gradient-bg {
+    background-image: linear-gradient(88.84deg, #6464ff 31.06%, #3c3c99 67.31%);
+  }
+
+  .button-gradient-bg {
+    background: linear-gradient(
+      94.61deg,
+      #8052fe -25.15%,
+      #7a62fd 24.09%,
+      #4dd4f8 213.62%
+    );
+  }
+
+  .dot-gradient-bg {
+    background-image: url("../../public/Dots-bg.png"),
+      linear-gradient(180deg, #f9f9ff 0%, #ffffff 100%);
+  }
+
+  .footer-bg {
+    background-image: url("../../public/footer-bg.png");
+    @apply bg-no-repeat bg-cover bg-blend-soft-light bg-indigo-50;
+  }
+
+  .btn-shadow {
+    box-shadow: 0px 4px 10px 0px #0000000a;
+  }
+
+  .tag-shadow {
+    box-shadow: 0px 6px 24px 0px #4d4d4d14;
+  }
+
+  .section-padding {
+    @apply py-16;
+  }
+
+  .container {
+    @apply container mx-auto;
+  }
+
+  .container {
+    width: 100%;
+    @media (width >= 40rem) {
+      max-width: 35rem;
+    }
+    @media (width >= 48rem) {
+      max-width: 43rem;
+    }
+    @media (width >= 64rem) {
+      max-width: 60rem;
+    }
+    @media (width >= 80rem) {
+      max-width: 75rem;
+    }
+    @media (width >= 96rem) {
+      max-width: 90rem;
+    }
+  }
+
+  .btn-radius-padding {
+    @apply rounded-lg px-4 py-2;
+  }
+
+  .fade-mask-vertical {
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0)
+    );
+  }
+  .section-title-width {
+    @apply max-w-130 mx-auto;
+  }
+
+  .dot-bg {
+    background-image: url("../../public/Dots-bg.png");
+  }
+
+  .card-gradient {
+    background: linear-gradient(
+      180deg,
+      #fcfcff 0%,
+      #f3f3ff 43.43%,
+      #e6e6fa 110.37%
+    );
+  }
+
+  .gradient-bg {
+    @apply bg-[url(/grad-bg.png)] bg-no-repeat bg-cover bg-left;
+  }
+
+  .rounded-card {
+    border-radius: 1rem;
+  }
+
+  .shadow-card {
+    box-shadow: 0 8px 28px rgba(30, 48, 93, 0.08);
+  }
+}
