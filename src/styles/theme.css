@@ -1,0 +1,33 @@
+@theme {
+  --color-grey: #6b7280;
+  --color-light-grey: #b0b0b0;
+  --color-title-black: #111827;
+  --color-purple: #3c3cc2;
+  --color-dark-grey: #4b5563;
+  --color-brand-bg: #f9f9ff;
+  --color-brand-surface: #ffffff;
+  --color-brand-border: #e6e6fa;
+  --color-brand-text: #4b5563;
+  --color-brand-muted: #7c80a0;
+  --color-brand-blue: #8052fe;
+  --color-brand-indigo: #7a62fd;
+  --color-brand-violet: #6464ff;
+  --color-brand-green: #40c057;
+  --color-brand-red: #fa5252;
+  --color-brand-yellow: #fab005;
+  --color-brand-subtle: #d7d5ff;
+  --height-header-height: 4.625rem;
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.75rem;
+  --text-6xl: 4.5rem;
+  --text-7xl: 6rem;
+  --text-8xl: 8rem;
+  --text-9xl: 10rem;
+}

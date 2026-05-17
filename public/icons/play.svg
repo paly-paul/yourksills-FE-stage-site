@@ -1,0 +1,20 @@
+<svg width="154" height="158" viewBox="0 0 154 158" fill="none" xmlns="http://www.w3.org/2000/svg">
+<foreignObject x="0.455532" y="4.03116" width="153.409" height="153.409"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(4px);clip-path:url(#bgblur_0_878_3296_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter0_d_878_3296)" data-figma-bg-blur-radius="8">
+<path d="M77.16 104.211C100.414 104.211 119.265 85.3594 119.265 62.1053C119.265 38.8512 100.414 20 77.16 20C53.9059 20 35.0547 38.8512 35.0547 62.1053C35.0547 85.3594 53.9059 104.211 77.16 104.211Z" fill="#313189"/>
+</g>
+<path opacity="0.4" d="M77.1582 0.5C111.788 0.500159 139.815 27.163 139.815 60C139.815 92.837 111.788 119.5 77.1582 119.5C42.5287 119.5 14.5 92.8371 14.5 60C14.5 27.1629 42.5287 0.5 77.1582 0.5Z" stroke="#3C3CC2"/>
+<path d="M90.8273 63.4561L73.4035 73.2562C71.1906 74.5026 68.3672 72.9629 68.3672 70.4946V50.2346C68.3672 47.7663 71.1652 46.2266 73.4035 47.473L90.8273 57.273C93.2692 58.6661 93.2692 62.0631 90.8273 63.4561Z" fill="white"/>
+<defs>
+<filter id="filter0_d_878_3296" x="0.455532" y="4.03116" width="153.409" height="153.409" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="18.6303"/>
+<feGaussianBlur stdDeviation="17.2996"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.180392 0 0 0 0 0.490196 0 0 0 0 0.196078 0 0 0 0.5 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_878_3296"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_878_3296" result="shape"/>
+</filter>
+<clipPath id="bgblur_0_878_3296_clip_path" transform="translate(-0.455532 -4.03116)"><path d="M77.16 104.211C100.414 104.211 119.265 85.3594 119.265 62.1053C119.265 38.8512 100.414 20 77.16 20C53.9059 20 35.0547 38.8512 35.0547 62.1053C35.0547 85.3594 53.9059 104.211 77.16 104.211Z"/>
+</clipPath></defs>
+</svg>
