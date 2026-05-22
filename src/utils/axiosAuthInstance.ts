@@ -3,7 +3,7 @@ import { getAuthToken, removeAuthToken } from "./cookieHelper";
 import { addDeduplicationInterceptor } from "./requestDeduplication";
 
 const authInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "/api",
+  baseURL: "/api",
   withCredentials: true,
 });
 
