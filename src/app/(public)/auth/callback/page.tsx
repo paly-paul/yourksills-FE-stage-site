@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
-export default function SocialAuthCallbackPage() {
+function SocialAuthCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setToken = useAuthStore((s) => s.setToken);
@@ -39,5 +40,21 @@ export default function SocialAuthCallbackPage() {
         <p className='text-grey text-base'>Completing sign in...</p>
       </div>
     </main>
+  );
+}
+
+export default function SocialAuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className='gradient-bg min-h-screen'>
+          <div className='container min-h-screen flex items-center justify-center p-6'>
+            <p className='text-grey text-base'>Completing sign in...</p>
+          </div>
+        </main>
+      }
+    >
+      <SocialAuthCallback />
+    </Suspense>
   );
 }

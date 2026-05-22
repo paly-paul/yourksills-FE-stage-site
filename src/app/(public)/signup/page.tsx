@@ -15,9 +15,11 @@ import { useCvFlowStore } from "@/store/useCvFlowStore";
 
 export default function SignupPage() {
   const router = useRouter(),
+    [firstName, setFirstName] = useState(""),
+    [lastName, setLastName] = useState(""),
+    [username, setUsername] = useState(""),
     [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
-    [name, setName] = useState(""),
     [validation, setValidation] = useState("");
 
   const setToken = useAuthStore((s) => s.setToken);
@@ -58,7 +60,7 @@ export default function SignupPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    registerUser({ username: name, email: email, password: password });
+    registerUser({ first_name: firstName, last_name: lastName, username, email, password });
   };
 
   return (
@@ -82,11 +84,27 @@ export default function SignupPage() {
             <p className='text-base text-grey'>Let&apos;s get started.</p>
 
             <form className='space-y-4 mt-10' onSubmit={handleSubmit}>
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+                <TextField
+                  type='text'
+                  label='First Name'
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  isRequired={true}
+                />
+                <TextField
+                  type='text'
+                  label='Last Name'
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  isRequired={true}
+                />
+              </div>
               <TextField
                 type='text'
-                label='Name'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                label='Username'
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 isRequired={true}
               />
               <TextField
