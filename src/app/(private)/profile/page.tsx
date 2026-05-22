@@ -183,6 +183,7 @@ export default function ProfilePage() {
             label='Current Password'
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
+            isRequired={false}
             classes='!bg-gray-50 !shadow-none'
           />
           <TextField
@@ -190,6 +191,7 @@ export default function ProfilePage() {
             label='New Password'
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            isRequired={false}
             classes='!bg-gray-50 !shadow-none'
           />
           <TextField
@@ -197,6 +199,7 @@ export default function ProfilePage() {
             label='Confirm New Password'
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            isRequired={false}
             classes='!bg-gray-50 !shadow-none'
           />
 
