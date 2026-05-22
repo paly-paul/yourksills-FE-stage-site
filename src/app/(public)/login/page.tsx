@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -31,7 +31,7 @@ import { useCvFlowStore } from "@/store/useCvFlowStore";
 //   };
 // };
 
-const Login = () => {
+function Login() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -75,8 +75,8 @@ const Login = () => {
     },
     onError: (error: unknown) => {
       if (typeof error === "object" && error !== null && "response" in error) {
-        // @ts-expect-error: dynamic error shape from axios
-        setValidation(error.response?.data?.message || error.message || "Something went wrong. Please try again.");
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
+        setValidation(err.response?.data?.message || err.message || "Something went wrong. Please try again.");
       } else if (error instanceof Error) {
         setValidation(error.message);
       } else {
@@ -164,6 +164,20 @@ const Login = () => {
       </div>
     </main>
   );
-};
+}
 
-export default Login;
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className='gradient-bg min-h-screen'>
+          <div className='container min-h-screen flex items-center justify-center'>
+            <p className='text-grey text-base'>Loading...</p>
+          </div>
+        </main>
+      }
+    >
+      <Login />
+    </Suspense>
+  );
+}

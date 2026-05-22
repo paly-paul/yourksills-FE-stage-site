@@ -13,7 +13,7 @@ function upstreamBaseUrl() {
   ).trim();
 }
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   const base = upstreamBaseUrl();
@@ -67,10 +67,6 @@ export async function POST(req: NextRequest) {
       : `Bearer ${t}`;
   }
 
-  // Create abort signal with 110s timeout (5s buffer before client timeout of 120s)
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 110_000);
-
   let upstreamRes: Response;
   try {
     upstreamRes = await fetch(url, {
@@ -78,17 +74,8 @@ export async function POST(req: NextRequest) {
       headers,
       body: formData,
       cache: "no-store",
-      signal: controller.signal,
     });
   } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === "AbortError") {
-      console.error("extract-cv upstream fetch aborted (timeout)");
-      return NextResponse.json(
-        { message: "CV extraction took too long. Please try again with a smaller file." },
-        { status: 504 }
-      );
-    }
     console.error("extract-cv upstream fetch failed:", error);
     return NextResponse.json(
       { message: "Upstream CV service is unreachable." },
@@ -96,10 +83,22 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  clearTimeout(timeoutId);
-
   const contentType = upstreamRes.headers.get("content-type") || "";
   const raw = await upstreamRes.text();
+
+  // Return clean JSON errors for upstream gateway/server errors instead of
+  // forwarding raw nginx HTML (e.g. 502, 503, 504 pages).
+  if (!upstreamRes.ok && !contentType.includes("application/json")) {
+    const messages: Record<number, string> = {
+      502: "CV service is temporarily unavailable. Please try again.",
+      503: "CV service is temporarily unavailable. Please try again.",
+      504: "CV extraction timed out on the server. Please try again with a smaller file.",
+    };
+    return NextResponse.json(
+      { message: messages[upstreamRes.status] || `Upstream error (${upstreamRes.status}).` },
+      { status: upstreamRes.status }
+    );
+  }
 
   if (contentType.includes("application/json")) {
     try {

@@ -32,8 +32,7 @@ export default function PrivateLayout({
           typeof error === "object" &&
           error !== null &&
           "response" in error
-            ? // @ts-expect-error axios error typing is dynamic
-              error.response?.status
+            ? (error as { response?: { status?: number } }).response?.status
             : undefined;
 
         if (status === 401 || status === 403) {

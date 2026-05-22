@@ -8,29 +8,29 @@ import { LeftBanner } from "@/components/LeftBanner";
 import { BackButton } from "@/components/BackButton";
 import { SocialSignIn } from "@/components/SocialSignIn";
 import publicInstance from "@/utils/axiosPublicInstance";
+import { useRouter } from "next/navigation";
 
 const ForgotPassword = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
-    setSuccessMessage("");
     setIsSubmitting(true);
 
     try {
-      await publicInstance.post("/forgot-password", { email });
-      setSuccessMessage(
-        "If your email exists in our system, a password reset link has been sent."
+      await publicInstance.post<{ success: boolean; message: string }>(
+        "/forgot-password",
+        { email }
       );
-      setEmail("");
+      router.push(`/forgotpassword/otp?email=${encodeURIComponent(email)}`);
     } catch (error: unknown) {
       if (typeof error === "object" && error !== null && "response" in error) {
-        // @ts-expect-error: dynamic error shape from axios
-        setErrorMessage(error.response?.data?.message || "Unable to send reset link. Please try again.");
+        const err = error as { response?: { data?: { message?: string } } };
+        setErrorMessage(err.response?.data?.message || "Unable to send reset link. Please try again.");
       } else if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {
@@ -59,7 +59,7 @@ const ForgotPassword = () => {
               Forgot your password?
             </h2>
             <p className='text-base text-grey'>
-              Enter your email address and we&apos;ll send you a reset link.
+              Enter your email address and we&apos;ll send you an OTP to reset your password.
             </p>
 
             <form className='space-y-4 mt-10' onSubmit={handleSubmit}>
@@ -73,15 +73,12 @@ const ForgotPassword = () => {
 
               <AccentButton
                 type='submit'
-                text={isSubmitting ? "Sending reset link..." : "Send reset link"}
+                text={isSubmitting ? "Sending OTP..." : "Send OTP"}
                 classes={"text-lg w-full"}
                 disabled={isSubmitting}
               />
               {errorMessage ? (
                 <p className='text-red-900 text-sm'>{errorMessage}</p>
-              ) : null}
-              {successMessage ? (
-                <p className='text-green-700 text-sm'>{successMessage}</p>
               ) : null}
             </form>
 
