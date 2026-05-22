@@ -3,6 +3,8 @@ import authInstance from "@/utils/axiosAuthInstance";
 export type ProfileResponse = {
   profile: {
     username?: string;
+    first_name?: string;
+    last_name?: string;
     email: string;
     id: number;
   };

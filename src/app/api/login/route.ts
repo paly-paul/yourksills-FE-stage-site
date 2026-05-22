@@ -58,7 +58,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const url = new URL("/login", base);
+  const url = `${base.replace(/\/+$/, "")}/login`;
 
   let upstreamRes: Response;
   try {

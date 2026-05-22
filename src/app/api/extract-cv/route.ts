@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const url = new URL("/extract-cv", base);
+  const url = new URL(`${base.replace(/\/+$/, "")}/extract-cv`);
   url.searchParams.set("user_id", userId);
 
   const headers: Record<string, string> = {};

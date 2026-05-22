@@ -2,6 +2,8 @@
 
 import ProfileProgressRing from "@/components/ProfileProgressRing";
 import { TextField } from "@/components/TextField";
+import { useEditProfileMutation } from "@/hooks/auth/editProfileHook";
+import { useProfile } from "@/hooks/auth/profileHook";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -9,13 +11,17 @@ import { FiArrowLeft } from "react-icons/fi";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { data: profileData } = useProfile();
+  const editProfileMutation = useEditProfileMutation();
+
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [validation, setValidation] = useState("");
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -27,11 +33,63 @@ export default function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    setValidation("success");
-  }, []);
+    if (!profileData?.profile) return;
+    const { first_name, last_name, email } = profileData.profile;
+    if (first_name) setFirstName(first_name);
+    if (last_name) setLastName(last_name);
+    if (email) setEmail(email);
+  }, [profileData]);
 
-  const handleSubmit = () => {
-    console.log("submit");
+  const profile = profileData?.profile;
+  const displayName =
+    [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
+    profile?.username ||
+    "";
+  const displayEmail = profile?.email || "";
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMsg("");
+
+    if (newPassword || confirmPassword) {
+      if (!currentPassword) {
+        setError("Enter your current password to set a new one.");
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setError("New passwords do not match.");
+        return;
+      }
+    }
+
+    const payload = {
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      ...(currentPassword
+        ? { current_password: currentPassword, new_password: newPassword }
+        : {}),
+    };
+
+    editProfileMutation.mutate(payload, {
+      onSuccess: (data) => {
+        setSuccessMsg(data.message || "Profile updated successfully.");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      },
+      onError: (err) => {
+        const axiosErr = err as {
+          response?: { data?: { message?: string } };
+        };
+        setError(
+          axiosErr.response?.data?.message ||
+            err.message ||
+            "Failed to update profile."
+        );
+      },
+    });
   };
 
   const handleBack = () => {
@@ -43,19 +101,14 @@ export default function ProfilePage() {
   };
 
   const { getRootProps, getInputProps, open } = useDropzone({
-    accept: {
-      "image/*": [],
-    },
+    accept: { "image/*": [] },
     maxFiles: 1,
     noClick: true,
     noKeyboard: true,
     onDrop: (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (!file) return;
-
-      const previewUrl = URL.createObjectURL(file);
-      console.log(previewUrl);
-      setAvatarUrl(previewUrl);
+      setAvatarUrl(URL.createObjectURL(file));
     },
   });
 
@@ -67,14 +120,14 @@ export default function ProfilePage() {
           onClick={handleBack}
           className='mb-5 inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-white px-4 py-2 text-sm font-medium text-purple-700 transition-all duration-300 hover:border-purple-700 hover:bg-purple-700 hover:text-white cursor-pointer'>
           <FiArrowLeft className='h-4 w-4' />
-          {/* Back */}
         </button>
+
         <div className='flex flex-col md:flex-row items-center gap-4 md:gap-6 pb-6 border-b border-zinc-200'>
           <div className='md:border-r border-zinc-200 pr-0 md:pr-4'>
             <div className='flex md:flex-row flex-col items-center gap-3'>
               <ProfileProgressRing
                 imageUrl={avatarUrl}
-                name='Anita Shen'
+                name={displayName}
                 size={isMobile ? 100 : 160}
               />
               <div {...getRootProps()} className='relative overflow-visible'>
@@ -90,20 +143,19 @@ export default function ProfilePage() {
 
           <div className='text-center md:text-left md:pl-4'>
             <h2 className='text-2xl md:text-4xl font-semibold gradient-text block'>
-              Anita Shen
+              {displayName}
             </h2>
             <span className='text-xs md:text-sm text-gray-500 bg-violet-50/50 px-4 md:px-6 py-1 rounded-full inline-block mt-1'>
-              anitashen@gmail.com
+              {displayEmail}
             </span>
           </div>
         </div>
 
-        {/* Form */}
         <form className='mt-8 space-y-4' onSubmit={handleSubmit}>
           <div className='grid md:grid-cols-2 gap-4'>
             <TextField
               type='text'
-              label='First name'
+              label='First Name'
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               isRequired={true}
@@ -128,32 +180,35 @@ export default function ProfilePage() {
           />
           <TextField
             type='password'
-            label='Password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            isRequired={true}
+            label='Current Password'
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
             classes='!bg-gray-50 !shadow-none'
           />
           <TextField
             type='password'
-            label='Change Password'
+            label='New Password'
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            isRequired={true}
             classes='!bg-gray-50 !shadow-none'
           />
           <TextField
             type='password'
-            label='Confirm Password'
+            label='Confirm New Password'
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            isRequired={true}
             classes='!bg-gray-50 !shadow-none'
           />
-          <p className='text-red-900 text-sm'>{validation}</p>
-          <div className='flex justify-end mt-8 w-full '>
-            <button className='bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-lg shadow-sm transition cursor-pointer'>
-              Save Changes
+
+          {error && <p className='text-red-600 text-sm'>{error}</p>}
+          {successMsg && <p className='text-green-600 text-sm'>{successMsg}</p>}
+
+          <div className='flex justify-end mt-8 w-full'>
+            <button
+              type='submit'
+              disabled={editProfileMutation.isPending}
+              className='bg-indigo-500 hover:bg-indigo-600 disabled:opacity-60 text-white px-6 py-2 rounded-lg shadow-sm transition cursor-pointer'>
+              {editProfileMutation.isPending ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
