@@ -124,7 +124,7 @@ export const SocialSignIn = () => {
   return (
     <>
       <div className='flex justify-center'>
-        <div ref={googleBtnRef} className='flex-1 flex justify-center' />
+        <div ref={googleBtnRef} className='w-56' />
       </div>
       {googleAuthMutation.isPending && (
         <p className='text-grey text-sm mt-2 text-center'>Signing in with Google...</p>
