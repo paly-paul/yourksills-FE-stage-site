@@ -158,15 +158,15 @@ export const SocialSignIn = () => {
 
   return (
     <>
-      <div className='flex space-x-4 items-center'>
+      <div className='flex space-x-4 items-center justify-center'>
         {/* Google button rendered by GSI — handles popup auth without FedCM */}
-        <div ref={googleBtnRef} className='flex-1' />
+        <div ref={googleBtnRef} className='flex-1 flex justify-center' />
 
-        <SocialButton
+        {/* <SocialButton
           icon='/icons/linkedin-color.svg'
           label='LinkedIn'
           onClick={startLinkedInAuth}
-        />
+        /> */}
       </div>
       {googleAuthMutation.isPending && (
         <p className='text-grey text-sm mt-2 text-center'>Signing in with Google...</p>
