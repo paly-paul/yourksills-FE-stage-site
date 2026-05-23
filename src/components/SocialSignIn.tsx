@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -33,30 +32,6 @@ declare global {
   }
 }
 
-interface SocialButtonProps {
-  icon: string;
-  label: string;
-  onClick?: () => void;
-  disabled?: boolean;
-}
-
-const SocialButton: React.FC<SocialButtonProps> = ({
-  icon,
-  label,
-  onClick,
-  disabled = false,
-}) => {
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      disabled={disabled}
-      className='cursor-pointer flex-1 flex items-center justify-center py-2 rounded-lg btn-shadow bg-gray-50/40 text-sm text-title-black transition disabled:opacity-50 disabled:cursor-not-allowed'>
-      <Image src={icon} alt={label} width={20} height={20} className='mr-2' />
-      {label}
-    </button>
-  );
-};
 
 export const SocialSignIn = () => {
   const router = useRouter();
@@ -146,27 +121,10 @@ export const SocialSignIn = () => {
     };
   }, []);
 
-  const startLinkedInAuth = () => {
-    const url = process.env.NEXT_PUBLIC_LINKEDIN_AUTH_URL;
-    if (!url) {
-      setOauthError("LinkedIn sign-in is not configured yet.");
-      return;
-    }
-    setOauthError("");
-    window.location.href = url;
-  };
-
   return (
     <>
-      <div className='flex space-x-4 items-center'>
-        {/* Google button rendered by GSI — handles popup auth without FedCM */}
-        <div ref={googleBtnRef} className='flex-1' />
-
-        <SocialButton
-          icon='/icons/linkedin-color.svg'
-          label='LinkedIn'
-          onClick={startLinkedInAuth}
-        />
+      <div className='flex justify-center'>
+        <div ref={googleBtnRef} className='flex-1 flex justify-center' />
       </div>
       {googleAuthMutation.isPending && (
         <p className='text-grey text-sm mt-2 text-center'>Signing in with Google...</p>
