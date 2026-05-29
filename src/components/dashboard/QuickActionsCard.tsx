@@ -1,7 +1,7 @@
 export default function QuickActionsCard() {
   return (
     <div className='bg-brand-surface rounded-card border border-brand-border shadow-card overflow-hidden animate-[fadeUp_0.5s_ease_0.25s_both]'>
-      <div className='p-[22px]'>
+      <div className='p-4 sm:p-[22px]'>
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-muted uppercase tracking-[.06em]'>
             <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5'>

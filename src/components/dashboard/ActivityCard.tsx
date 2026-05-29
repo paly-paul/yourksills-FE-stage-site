@@ -1,4 +1,5 @@
 import type { SnapShotData } from "@/services/snapshot/generateAllInsightsService";
+import type { PredictModelOneResult } from "@/services/jobPrediction/getPredictModelOneResultService";
 
 interface ActivityItem {
   dotColor: string;
@@ -11,6 +12,7 @@ interface ActivityItem {
 
 interface Props {
   insightsData?: SnapShotData;
+  predictionData?: PredictModelOneResult;
   isLoading?: boolean;
 }
 
@@ -57,25 +59,78 @@ const ACTIVITIES: ActivityItem[] = [
   },
 ];
 
-export default function ActivityCard({ isLoading }: Props) {
-  // Use default activities for now
-  const activities = ACTIVITIES;
+function getSnapshotItems(
+  insightsData?: SnapShotData,
+  predictionData?: PredictModelOneResult
+): ActivityItem[] {
+  const bf = predictionData?.best_fit;
+  if (!bf) return ACTIVITIES;
+
+  const careerStage =
+    insightsData?.results?.Growth_and_Market?.Pitches?.["Career Stage"] ?? "—";
+
+  return [
+    {
+      dotColor: "#7950f2",
+      title: "Role Identified",
+      meta: `${bf.job_role} · ${bf.managerial_level}`,
+      badge: "Best Fit",
+      badgeBg: "#f5f3ff",
+      badgeColor: "#7950f2",
+    },
+    {
+      dotColor: "#3b5bdb",
+      title: "Overall Match",
+      meta: `${bf.overall_match_pct} overall · ${bf.talent_match_pct} talent`,
+      badge: "Score",
+      badgeBg: "#eef1ff",
+      badgeColor: "#3b5bdb",
+    },
+    {
+      dotColor: "#40c057",
+      title: "Career Stage",
+      meta: `${careerStage} · ${bf.job_family}`,
+      badge: "Stage",
+      badgeBg: "#e6f9ed",
+      badgeColor: "#40c057",
+    },
+    {
+      dotColor: "#fab005",
+      title: "Skills Aligned",
+      meta: `${bf.matched_skills.length} matched · ${bf.missing_skills.length} to develop`,
+      badge: "Skills",
+      badgeBg: "#fff9e6",
+      badgeColor: "#fab005",
+    },
+    {
+      dotColor: "#8792b2",
+      title: "Sector Focus",
+      meta: `${bf.sector} · ${bf.industry}`,
+      badge: "Industry",
+      badgeBg: "#f2f4fb",
+      badgeColor: "#8792b2",
+    },
+  ];
+}
+
+export default function ActivityCard({ insightsData, predictionData, isLoading }: Props) {
+  const activities = getSnapshotItems(insightsData, predictionData);
   return (
     <div className='bg-brand-surface rounded-card border border-brand-border shadow-card overflow-hidden animate-[fadeUp_0.5s_ease_0.25s_both]'>
-      <div className='p-[22px]'>
+      <div className='p-4 sm:p-[22px]'>
         <div className='flex items-center justify-between mb-4'>
-          <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-muted uppercase tracking-[.06em]'>
+          <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-foreground uppercase tracking-[.06em]'>
             <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
               <circle cx='12' cy='12' r='10' />
               <polyline points='12 6 12 12 16 14' />
             </svg>
-            Latest Activity
+            Role Snapshot
           </div>
         </div>
 
         {isLoading ? (
           <div className='text-center py-8'>
-            <p className='text-sm text-brand-muted'>Loading activity...</p>
+            <p className='text-sm text-brand-muted'>Loading snapshot...</p>
           </div>
         ) : (
           <div className='flex flex-col'>

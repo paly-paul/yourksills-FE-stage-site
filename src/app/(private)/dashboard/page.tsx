@@ -60,7 +60,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className='max-w-[1120px] mx-auto px-5 pt-7 pb-12'>
+    <div className='max-w-[1120px] mx-auto px-4 sm:px-5 pt-5 sm:pt-7 pb-12'>
       <GreetingBanner
         skillMatch={skillMatch}
         behavioralMatch={behavioralMatch}
@@ -85,10 +85,10 @@ export default function DashboardPage() {
           <PredictedRoleCard predictionData={predictionData} isLoading={predictionLoading} />
           <SkillSnapshotCard insightsData={insightsData} isLoading={isLoading} />
           <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-            <SkillGapCard insightsData={insightsData} />
-            <ActivityCard insightsData={insightsData} />
+            <SkillGapCard insightsData={insightsData} isLoading={isLoading} />
+            <ActivityCard insightsData={insightsData} predictionData={predictionData} isLoading={predictionLoading} />
           </div>
-          <SkillJourneyChart insightsData={insightsData} />
+          <SkillJourneyChart insightsData={insightsData} isLoading={isLoading} />
         </div>
       </div>
 

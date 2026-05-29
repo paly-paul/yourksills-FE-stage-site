@@ -14,7 +14,7 @@ export default function GreetingBanner({
   if (isLoading) {
     return (
       <div
-        className='rounded-card px-8 py-7 text-white mb-6 flex items-center justify-between gap-5 relative overflow-hidden animate-[fadeUp_0.5s_ease_both] sm:flex-row flex-col sm:items-center items-start'
+        className='rounded-card px-5 py-5 sm:px-8 sm:py-7 text-white mb-6 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-5 animate-[fadeUp_0.5s_ease_both]'
         style={{ background: "linear-gradient(94.61deg,#8052fe -25.15%,#7a62fd 24.09%,#4dd4f8 213.62%)" }}>
         <div className='h-20 bg-white/10 rounded-lg flex-1 animate-pulse' />
       </div>
@@ -39,7 +39,7 @@ export default function GreetingBanner({
         </p>
       </div>
 
-      <div className='relative z-10 flex items-center gap-4 flex-shrink-0 sm:w-auto w-full'>
+      <div className='relative z-10 flex items-center gap-3 sm:gap-4 flex-shrink-0 sm:w-auto w-full justify-between sm:justify-start'>
         <div className='text-center' title='Overall Skill Match %'>
           <div className='text-2xl font-semibold leading-none'>{skillMatch}%</div>
           <div className='text-xs opacity-70 mt-1'>Skill</div>

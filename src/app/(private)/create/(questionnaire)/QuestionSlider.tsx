@@ -1,5 +1,7 @@
 import QuestionCard from "./QuestionCard";
 import { QuestionnaireResponseType } from "@/store/useQuestionnaireResponseStore";
+import { AccentButton } from "@/components/CustomButton";
+import Image from "next/image";
 
 
 export type Question = {
@@ -46,6 +48,35 @@ export default function QuestionSlider({
   existingAnswers,
   currentStep,
 }: QuestionSliderProps) {
+
+  if (!questions || questions.length === 0) {
+    return (
+      <div className='w-full flex justify-center pt-24 md:pt-32 px-4'>
+        <div className='flex w-full py-8 justify-center items-start'>
+          <div className='w-full max-w-[1100px] flex-shrink-0'>
+            <div className='bg-white p-4 md:p-6 rounded-xl tag-shadow text-center'>
+              <div className='flex flex-col items-center gap-3 py-4'>
+                <Image
+                  src='/icons/check-circle-gradient.svg'
+                  alt='All good'
+                  width={48}
+                  height={48}
+                />
+                <p className='text-grey font-medium text-base'>
+                  No missing entries — your resume is all set!
+                </p>
+              </div>
+              <AccentButton
+                text='Next'
+                action={handleNext}
+                classes='mt-4 w-full text-base'
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='w-full flex justify-center pt-24 md:pt-32 px-4'>

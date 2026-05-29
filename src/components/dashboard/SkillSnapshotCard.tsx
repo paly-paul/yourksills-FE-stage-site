@@ -1,12 +1,12 @@
 import type { SnapShotData } from "@/services/snapshot/generateAllInsightsService";
 
-interface SkillBar {
-  abbr: string;
-  name: string;
-  score: number;
-  iconBg: string;
-  iconColor: string;
-  barGradient: string;
+interface PillarRow {
+  pillar: string;
+  action: string;
+  outcome: string;
+  dotColor: string;
+  accentBg: string;
+  accentColor: string;
 }
 
 interface Props {
@@ -14,205 +14,110 @@ interface Props {
   isLoading?: boolean;
 }
 
-const SKILLS: SkillBar[] = [
-  { abbr: "Py", name: "Python", score: 90, iconBg: "#eef1ff", iconColor: "#3b5bdb", barGradient: "linear-gradient(90deg,#3b5bdb,#4c6ef5)" },
-  { abbr: "SQ", name: "SQL", score: 82, iconBg: "#e3f9fc", iconColor: "#22b8cf", barGradient: "linear-gradient(90deg,#22b8cf,#3b5bdb)" },
-  { abbr: "DV", name: "Data Visualization", score: 76, iconBg: "#f5f3ff", iconColor: "#7950f2", barGradient: "linear-gradient(90deg,#7950f2,#a78bfa)" },
-  { abbr: "ML", name: "Machine Learning", score: 64, iconBg: "#e6f9ed", iconColor: "#40c057", barGradient: "linear-gradient(90deg,#40c057,#22b8cf)" },
-  { abbr: "St", name: "Statistics", score: 71, iconBg: "#fff9e6", iconColor: "#fab005", barGradient: "linear-gradient(90deg,#fab005,#fd7e14)" },
+const PILLAR_COLORS = [
+  { dotColor: "#7950f2", accentBg: "#f5f3ff", accentColor: "#7950f2" },
+  { dotColor: "#3b5bdb", accentBg: "#eef1ff", accentColor: "#3b5bdb" },
+  { dotColor: "#0c8599", accentBg: "#e3f9fc", accentColor: "#0c8599" },
+  { dotColor: "#2f9e44", accentBg: "#e6f9ed", accentColor: "#2f9e44" },
+  { dotColor: "#e67700", accentBg: "#fff9e6", accentColor: "#e67700" },
+  { dotColor: "#d9480f", accentBg: "#fff4e6", accentColor: "#d9480f" },
 ];
 
-const TOP_PILLS = [
-  { label: "Python", highlight: true },
-  { label: "SQL", highlight: true },
-  { label: "Data Visualization", highlight: true },
-  { label: "Machine Learning", highlight: false },
-  { label: "Statistics", highlight: false },
-  { label: "Jira", highlight: false },
-  { label: "System Design", highlight: false },
-  { label: "Stakeholder Mgmt", highlight: false },
+const FALLBACK_PILLARS: PillarRow[] = [
+  { pillar: "Construction Management", action: "Overseeing core construction", outcome: "On-time project delivery",     ...PILLAR_COLORS[0] },
+  { pillar: "Project Execution",        action: "Managing project schedules",  outcome: "Within-budget completion",     ...PILLAR_COLORS[1] },
+  { pillar: "Site Supervision",         action: "Leading construction teams",  outcome: "Zero safety incidents",        ...PILLAR_COLORS[2] },
+  { pillar: "Budget & Cost Control",    action: "Controlling project budgets", outcome: "Reduced project delays",       ...PILLAR_COLORS[3] },
+  { pillar: "QA/QC & HSE",             action: "Ensuring quality and safety", outcome: "Successful project completion", ...PILLAR_COLORS[4] },
+  { pillar: "Team Leadership",          action: "Coordinating subcontractors", outcome: "Efficient resource management", ...PILLAR_COLORS[5] },
 ];
 
-/**
- * Extract skills from insights data
- */
-function getSkillsFromInsights(insightsData?: SnapShotData): SkillBar[] {
-  if (!insightsData?.results?.Technical_and_Career?.["Skills Analysis"]) {
-    return SKILLS;
+function getPillarsFromInsights(insightsData?: SnapShotData): {
+  pillars: PillarRow[];
+  takeaway: string;
+} {
+  const block = insightsData?.results?.Skill_and_Role?.Skill_Pillars;
+
+  if (!block || !Array.isArray(block.Skill_Pillars) || block.Skill_Pillars.length === 0) {
+    return { pillars: FALLBACK_PILLARS, takeaway: "" };
   }
 
-  const skillsAnalysis = insightsData.results.Technical_and_Career["Skills Analysis"];
-  const hotSkills = skillsAnalysis["Hot Skills"];
+  const pillars = block.Skill_Pillars.map((pillar, i) => ({
+    pillar,
+    action: block.What_you_are_doing[i] ?? "—",
+    outcome: block.Outcome[i] ?? "—",
+    ...PILLAR_COLORS[i % PILLAR_COLORS.length],
+  }));
 
-  // Ensure hotSkills is an array
-  if (!Array.isArray(hotSkills) || hotSkills.length === 0) {
-    return SKILLS;
-  }
-
-  const colors = [
-    {
-      iconBg: "#eef1ff",
-      iconColor: "#3b5bdb",
-      barGradient: "linear-gradient(90deg,#3b5bdb,#4c6ef5)",
-    },
-    {
-      iconBg: "#e3f9fc",
-      iconColor: "#22b8cf",
-      barGradient: "linear-gradient(90deg,#22b8cf,#3b5bdb)",
-    },
-    {
-      iconBg: "#f5f3ff",
-      iconColor: "#7950f2",
-      barGradient: "linear-gradient(90deg,#7950f2,#a78bfa)",
-    },
-    {
-      iconBg: "#e6f9ed",
-      iconColor: "#40c057",
-      barGradient: "linear-gradient(90deg,#40c057,#22b8cf)",
-    },
-    {
-      iconBg: "#fff9e6",
-      iconColor: "#fab005",
-      barGradient: "linear-gradient(90deg,#fab005,#fd7e14)",
-    },
-  ];
-
-  return hotSkills.slice(0, 5).map((skill: { Skill?: string; "Importance (%)"?: number }, index: number) => {
-    const color = colors[index] || colors[0];
-    const importance = skill["Importance (%)"];
-    
-    return {
-      abbr: (skill.Skill || "").substring(0, 2).toUpperCase(),
-      name: skill.Skill || "Unknown",
-      score: Math.min(100, typeof importance === "number" ? importance : 0) as number,
-      iconBg: color.iconBg,
-      iconColor: color.iconColor,
-      barGradient: color.barGradient,
-    };
-  });
+  return { pillars, takeaway: block.Takeaway ?? "" };
 }
 
-/**
- * Extract top pills from insights data
- */
-function getTopPillsFromInsights(
-  insightsData?: SnapShotData
-): Array<{ label: string; highlight: boolean }> {
-  if (!insightsData?.results?.Technical_and_Career?.["Skills Analysis"]) {
-    return TOP_PILLS;
-  }
+export default function SkillSnapshotCard({ insightsData, isLoading }: Props) {
+  const { pillars, takeaway } = getPillarsFromInsights(insightsData);
 
-  const skills = insightsData.results.Technical_and_Career["Skills Analysis"];
-  const hotSkills = skills["Hot Skills"];
-  const warmSkills = skills["Warm Skills"];
-
-  // Ensure both are arrays
-  if ((!Array.isArray(hotSkills) || hotSkills.length === 0) && 
-      (!Array.isArray(warmSkills) || warmSkills.length === 0)) {
-    return TOP_PILLS;
-  }
-
-  const pills = [
-    ...(Array.isArray(hotSkills) ? hotSkills : []).slice(0, 3).map((skill: { Skill?: string }) => ({
-      label: skill.Skill || "Unknown",
-      highlight: true,
-    })),
-    ...(Array.isArray(warmSkills) ? warmSkills : []).slice(0, 5).map((skill: { Skill?: string }) => ({
-      label: skill.Skill || "Unknown",
-      highlight: false,
-    })),
-  ];
-
-  // Deduplicate pills by label
-  const uniquePills = Array.from(
-    new Map(pills.map(p => [p.label, p])).values()
-  );
-
-  return uniquePills.slice(0, 8);
-}
-
-export default function SkillSnapshotCard({
-  insightsData,
-  isLoading,
-}: Props) {
-  const skills = getSkillsFromInsights(insightsData);
-  const topPills = getTopPillsFromInsights(insightsData);
   return (
     <div className='bg-brand-surface rounded-card border border-brand-border shadow-card overflow-hidden animate-[fadeUp_0.5s_ease_0.15s_both]'>
-      <div className='p-[22px]'>
-        <div className='flex items-center justify-between mb-4'>
-          <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-muted uppercase tracking-[.06em]'>
+      <div className='p-4 sm:p-[22px]'>
+        {/* Header */}
+        <div className='flex items-center mb-4'>
+          <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-violet uppercase tracking-[.06em]'>
             <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5'>
-              <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2' />
+              <rect x='3' y='3' width='7' height='7' rx='1' />
+              <rect x='14' y='3' width='7' height='7' rx='1' />
+              <rect x='3' y='14' width='7' height='7' rx='1' />
+              <rect x='14' y='14' width='7' height='7' rx='1' />
             </svg>
-            Skill Snapshot
+            Skill Pillars
           </div>
-          <button className='flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#f5f3ff] border-[1.5px] border-[#c4b5fd] text-brand-violet hover:bg-[#ede9fe] transition-colors'>
-            <svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-              <path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z' />
-              <circle cx='12' cy='12' r='3' />
-            </svg>
-            View full report
-          </button>
         </div>
 
         {isLoading ? (
           <div className='text-center py-8'>
-            <p className='text-sm text-brand-muted'>Loading skills...</p>
+            <p className='text-sm text-brand-muted'>Loading pillars...</p>
           </div>
         ) : (
           <>
-            <div
-              className='rounded-xl p-4 mb-4'
-              style={{
-                background: "linear-gradient(125deg,#eef2ff 0%,#f5f3ff 50%,#fdf4ff 100%)",
-                border: "1.5px solid #ddd6fe",
-              }}>
-              <div className='inline-flex items-center gap-1.5 text-xs font-semibold text-brand-violet bg-[#ede9fe] px-2.5 py-[3px] rounded-full mb-2.5'>
-                <svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5'>
-                  <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2' />
-                </svg>
-                Top Skills
-              </div>
-              <div className='flex flex-wrap gap-1.5'>
-                {topPills.map(({ label, highlight }) => (
-                  <span
-                    key={label}
-                    className={`text-xs font-medium px-3 py-[5px] rounded-full border-[1.5px] ${
-                      highlight
-                        ? "border-[#c4b5fd] text-brand-violet font-semibold"
-                        : "border-[#ddd6fe] text-brand-text bg-white"
-                    }`}
-                    style={highlight ? { background: "linear-gradient(90deg,#eef1ff,#f5f3ff)" } : {}}>
-                    {label}
-                  </span>
-                ))}
-              </div>
+            {/* Column labels — desktop only */}
+            <div className='hidden sm:grid grid-cols-[1fr_1fr_1fr] gap-3 px-3.5 mb-1.5'>
+              <span className='text-[10px] font-semibold text-brand-muted uppercase tracking-wide'>Pillar</span>
+              <span className='text-[10px] font-semibold text-brand-muted uppercase tracking-wide'>What you do</span>
+              <span className='text-[10px] font-semibold text-brand-muted uppercase tracking-wide'>Outcome</span>
             </div>
 
-            <div className='text-xs font-semibold text-brand-muted uppercase tracking-[.06em] mb-2'>
-              Skills analysis · Importance (%)
-            </div>
-            <div className='flex flex-col gap-3'>
-              {skills.map(({ abbr, name, score, iconBg, iconColor, barGradient }) => (
-                <div key={name} className='flex items-center gap-2.5'>
-                  <div
-                    className='w-8 h-8 rounded-lg flex items-center justify-center text-[13px] font-bold flex-shrink-0'
-                    style={{ background: iconBg, color: iconColor }}>
-                    {abbr}
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <div className='text-xs font-semibold mb-[5px]'>{name}</div>
-                    <div className='h-[5px] bg-[#eef1ff] rounded-full overflow-hidden'>
-                      <div className='h-full rounded-full' style={{ width: `${score}%`, background: barGradient }} />
+            {/* Rows */}
+            <div className='flex flex-col gap-2'>
+              {pillars.map(({ pillar, action, outcome, dotColor, accentBg, accentColor }) => (
+                <div
+                  key={pillar}
+                  className='flex items-start justify-between gap-2 sm:grid sm:grid-cols-[1fr_1fr_1fr] sm:items-center sm:gap-3 px-3.5 py-3 rounded-[11px] bg-brand-bg border border-brand-border'>
+                  {/* Pillar — on mobile also shows action as subtitle */}
+                  <div className='flex items-start gap-2 min-w-0'>
+                    <div className='w-2 h-2 rounded-full flex-shrink-0 mt-1' style={{ background: dotColor }} />
+                    <div className='min-w-0'>
+                      <span className='text-xs font-semibold leading-snug block'>{pillar}</span>
+                      <span className='sm:hidden text-xs text-brand-muted leading-snug mt-0.5 block'>{action}</span>
                     </div>
                   </div>
-                  <div className='text-xs font-semibold min-w-[32px] text-right' style={{ color: iconColor }}>
-                    {score}
-                  </div>
+
+                  {/* Action — desktop only */}
+                  <span className='hidden sm:block text-xs text-brand-muted leading-snug'>{action}</span>
+
+                  {/* Outcome */}
+                  <span
+                    className='text-xs font-medium px-2 py-0.5 rounded-full text-center leading-snug flex-shrink-0 self-start sm:self-auto'
+                    style={{ background: accentBg, color: accentColor }}>
+                    {outcome}
+                  </span>
                 </div>
               ))}
             </div>
+
+            {/* Takeaway */}
+            {takeaway && (
+              <p className='mt-3 text-xs text-brand-muted leading-relaxed border-t border-brand-border pt-3'>
+                {takeaway}
+              </p>
+            )}
           </>
         )}
       </div>

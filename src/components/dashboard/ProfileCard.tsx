@@ -58,7 +58,7 @@ export default function ProfileCard({
   return (
     <div className='bg-brand-surface rounded-card border border-brand-border shadow-card overflow-hidden animate-[fadeUp_0.5s_ease_0.05s_both]'>
       <div
-        className='px-[22px] pt-6 pb-5 relative overflow-hidden'
+        className='px-4 sm:px-[22px] pt-5 sm:pt-6 pb-4 sm:pb-5 relative overflow-hidden'
         style={{ background: "linear-gradient(94.61deg,#8052fe -25.15%,#7a62fd 24.09%,#4dd4f8 213.62%)" }}>
         <div className='absolute -top-[30px] -right-[30px] w-[120px] h-[120px] rounded-full bg-white/[.07] pointer-events-none' />
 
@@ -90,7 +90,7 @@ export default function ProfileCard({
         </div>
       </div>
 
-      <div className='px-[22px] py-[18px]'>
+      <div className='px-4 sm:px-[22px] py-4 sm:py-[18px]'>
         <div className='flex items-center justify-between mb-1.5'>
           <span className='text-[12px] font-semibold text-brand-muted'>Profile Completion</span>
           <span className='text-[12px] font-bold text-brand-blue'>{profileCompletion}%</span>

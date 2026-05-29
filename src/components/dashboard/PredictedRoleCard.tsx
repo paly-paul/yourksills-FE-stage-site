@@ -61,7 +61,7 @@ export default function PredictedRoleCard({ predictionData, isLoading }: Props) 
 
   return (
     <div
-      className='rounded-card p-6 text-white relative overflow-hidden border-0 animate-[fadeUp_0.5s_ease_0.1s_both]'
+      className='rounded-card p-4 sm:p-6 text-white relative overflow-hidden border-0 animate-[fadeUp_0.5s_ease_0.1s_both]'
       style={{
         background: "linear-gradient(94.61deg,#8052fe -25.15%,#7a62fd 24.09%,#4dd4f8 213.62%)",
         boxShadow: "0 8px 32px rgba(122,98,253,.28)",
