@@ -24,24 +24,13 @@ interface Props {
   isLoading?: boolean;
 }
 
-const LABELS = ["Python", "SQL", "Data Viz", "ML", "Statistics", "System Design", "Stakeholder", "Jira"];
-
-const CHART_DATA: ChartData<"bar"> = {
-  labels: LABELS,
+const FALLBACK_DATA: ChartData<"bar"> = {
+  labels: ["Python", "SQL", "Data Viz", "ML", "Statistics", "System Design", "Stakeholder", "Jira"],
   datasets: [
     {
-      label: "Current",
+      label: "Importance (%)",
       data: [90, 82, 76, 64, 71, 78, 85, 80],
       backgroundColor: "rgba(128,82,254,0.85)",
-      borderRadius: 6,
-      borderSkipped: false as const,
-      barPercentage: 0.55,
-      categoryPercentage: 0.75,
-    },
-    {
-      label: "Role Required",
-      data: [85, 95, 90, 80, 85, 70, 75, 70],
-      backgroundColor: "rgba(77,212,248,0.65)",
       borderRadius: 6,
       borderSkipped: false as const,
       barPercentage: 0.55,
@@ -57,7 +46,7 @@ const CHART_OPTIONS: ChartOptions<"bar"> = {
     legend: {
       position: "top",
       labels: {
-        font: { family: "DM Sans", size: 12 },
+        font: { family: "Outfit", size: 12 },
         boxWidth: 10,
         usePointStyle: true,
         padding: 16,
@@ -65,14 +54,14 @@ const CHART_OPTIONS: ChartOptions<"bar"> = {
     },
     tooltip: {
       callbacks: {
-        label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y}`,
+        label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y}%`,
       },
     },
   },
   scales: {
     x: {
       grid: { display: false },
-      ticks: { font: { family: "DM Sans", size: 11 }, color: "#8792b2" },
+      ticks: { font: { family: "Outfit", size: 11 }, color: "#8792b2" },
       border: { display: false },
     },
     y: {
@@ -80,9 +69,10 @@ const CHART_OPTIONS: ChartOptions<"bar"> = {
       max: 100,
       grid: { color: "rgba(0,0,0,.05)" },
       ticks: {
-        font: { family: "DM Sans", size: 11 },
+        font: { family: "Outfit", size: 11 },
         color: "#8792b2",
         stepSize: 25,
+        callback: (val) => `${val}%`,
       },
       border: { display: false },
     },
@@ -91,69 +81,49 @@ const CHART_OPTIONS: ChartOptions<"bar"> = {
 
 const TABS: Tab[] = ["Technical skills", "Functional skills", "Behavioral skills"];
 
-/**
- * Extract skill journey data from insights
- */
+const TAB_COLORS: Record<Tab, string> = {
+  "Technical skills": "rgba(128,82,254,0.85)",
+  "Functional skills": "rgba(77,212,248,0.75)",
+  "Behavioral skills": "rgba(64,192,87,0.8)",
+};
+
+const TAB_TO_CATEGORY: Record<Tab, "Hot Skills" | "Warm Skills" | "Getting There Skills"> = {
+  "Technical skills": "Hot Skills",
+  "Functional skills": "Warm Skills",
+  "Behavioral skills": "Getting There Skills",
+};
+
+const TAB_TO_TAKEAWAY: Record<Tab, "Takeaway_ts" | "Takeaway_fs" | "Takeaway_bs"> = {
+  "Technical skills": "Takeaway_ts",
+  "Functional skills": "Takeaway_fs",
+  "Behavioral skills": "Takeaway_bs",
+};
+
 function getSkillJourneyData(
-  insightsData?: SnapShotData,
-  tab?: Tab
-): ChartData<"bar"> {
-  const skillJourney = insightsData?.results?.Skill_and_Role?.Skill_Journey;
+  insightsData: SnapShotData | undefined,
+  tab: Tab
+): { chartData: ChartData<"bar">; takeaway: string } {
+  const skillsAnalysis = insightsData?.results?.Technical_and_Career?.["Skills Analysis"];
 
-  if (!skillJourney) {
-    return CHART_DATA;
+  if (!skillsAnalysis) {
+    return { chartData: FALLBACK_DATA, takeaway: "" };
   }
 
-  const tabToKey: Record<Tab, string> = {
-    "Technical skills": "Technical",
-    "Functional skills": "Functional",
-    "Behavioral skills": "Behavioral",
-  };
+  const skills = skillsAnalysis[TAB_TO_CATEGORY[tab]];
 
-  const key = tabToKey[tab || "Technical skills"];
-  const polishedCandidate = skillJourney.Polished_Candidate as unknown as Record<
-    string,
-    Array<{ Skill?: string; "Current (%)"?: number; "Required (%)"?: number }>
-  >;
-
-  if (!polishedCandidate || typeof polishedCandidate !== "object") {
-    return CHART_DATA;
+  if (!Array.isArray(skills) || skills.length === 0) {
+    return { chartData: FALLBACK_DATA, takeaway: "" };
   }
 
-  const skillData = polishedCandidate[key];
+  const sliced = skills.slice(0, 8);
 
-  // Ensure skillData is an array
-  if (!Array.isArray(skillData) || skillData.length === 0) {
-    return CHART_DATA;
-  }
-
-  // Extract skills and scores
-  const labels = skillData.slice(0, 8).map((skill) => skill.Skill || "Unknown");
-  const currentScores = skillData.slice(0, 8).map((skill) => {
-    const val = skill["Current (%)"];
-    return typeof val === "number" ? val : 0;
-  });
-  const requiredScores = skillData.slice(0, 8).map((skill) => {
-    const val = skill["Required (%)"];
-    return typeof val === "number" ? val : 0;
-  });
-
-  return {
-    labels,
+  const chartData: ChartData<"bar"> = {
+    labels: sliced.map((s) => s.Skill),
     datasets: [
       {
-        label: "Current",
-        data: currentScores,
-        backgroundColor: "rgba(128,82,254,0.85)",
-        borderRadius: 6,
-        borderSkipped: false as const,
-        barPercentage: 0.55,
-        categoryPercentage: 0.75,
-      },
-      {
-        label: "Role Required",
-        data: requiredScores,
-        backgroundColor: "rgba(77,212,248,0.65)",
+        label: "Importance (%)",
+        data: sliced.map((s) => s["Importance (%)"]),
+        backgroundColor: TAB_COLORS[tab],
         borderRadius: 6,
         borderSkipped: false as const,
         barPercentage: 0.55,
@@ -161,23 +131,28 @@ function getSkillJourneyData(
       },
     ],
   };
+
+  const takeaway =
+    insightsData?.results?.Skill_and_Role?.Skill_Journey?.[TAB_TO_TAKEAWAY[tab]] ?? "";
+
+  return { chartData, takeaway };
 }
 
 export default function SkillJourneyChart({ insightsData, isLoading }: Props) {
-  const [activeTab, setActiveTab] = useState<Tab>("Functional skills");
-  const chartData = getSkillJourneyData(insightsData, activeTab);
+  const [activeTab, setActiveTab] = useState<Tab>("Technical skills");
+  const { chartData, takeaway } = getSkillJourneyData(insightsData, activeTab);
 
   return (
     <div className='bg-brand-surface rounded-card border border-brand-border shadow-card overflow-hidden animate-[fadeUp_0.5s_ease_0.3s_both]'>
-      <div className='p-[22px]'>
+      <div className='p-4 sm:p-[22px]'>
         <div className='flex items-center justify-between mb-4 flex-wrap gap-3'>
-          <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-muted uppercase tracking-[.06em]'>
+          <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-blue uppercase tracking-[.06em]'>
             <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5'>
               <polyline points='22 12 18 12 15 21 9 3 6 12 2 12' />
             </svg>
             Skill Journey
           </div>
-          <div className='flex gap-1.5'>
+          <div className='flex gap-1.5 flex-wrap justify-end'>
             {TABS.map((tab) => (
               <button
                 key={tab}
@@ -198,9 +173,17 @@ export default function SkillJourneyChart({ insightsData, isLoading }: Props) {
             <p className='text-sm text-brand-muted'>Loading skill journey...</p>
           </div>
         ) : (
-          <div className='relative h-60'>
-            <Bar data={chartData} options={CHART_OPTIONS} />
-          </div>
+          <>
+            <div className='relative h-48 sm:h-60'>
+              <Bar data={chartData} options={CHART_OPTIONS} />
+            </div>
+
+            {takeaway && (
+              <p className='mt-3 text-xs text-brand-muted leading-relaxed border-t border-brand-border pt-3'>
+                {takeaway}
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

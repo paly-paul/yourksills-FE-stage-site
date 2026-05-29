@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { SnapShotData } from "@/services/snapshot/generateAllInsightsService";
 
 type GapLevel = "High" | "Mid" | "Low";
@@ -69,9 +72,12 @@ function getGapSkillsFromInsights(insightsData?: SnapShotData): GapItem[] {
 
 export default function SkillGapCard({ insightsData, isLoading }: Props) {
   const gaps = getGapSkillsFromInsights(insightsData);
+  const learnItems: string[] =
+    insightsData?.results?.Growth_and_Market?.["What to do next"]?.Learn ?? [];
+  const [showLearn, setShowLearn] = useState(false);
   return (
     <div className='bg-brand-surface rounded-card border border-brand-border shadow-card overflow-hidden animate-[fadeUp_0.5s_ease_0.2s_both]'>
-      <div className='p-[22px]'>
+      <div className='p-4 sm:p-[22px]'>
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center gap-1.5 text-xs font-semibold text-brand-red uppercase tracking-[.06em]'>
             <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
@@ -107,8 +113,9 @@ export default function SkillGapCard({ insightsData, isLoading }: Props) {
               ))}
             </div>
 
-            <div
-              className='flex items-center gap-1.5 mt-3.5 px-3.5 py-[11px] rounded-[11px]'
+            <button
+              onClick={() => setShowLearn((v) => !v)}
+              className='w-full flex items-center gap-1.5 mt-3.5 px-3.5 py-[11px] rounded-[11px] text-left transition-opacity hover:opacity-80'
               style={{ background: "linear-gradient(90deg,#eef1ff,#f5f3ff)", border: "1px solid #ddd6fe" }}>
               <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#7950f2' strokeWidth='2'>
                 <path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6' />
@@ -116,7 +123,25 @@ export default function SkillGapCard({ insightsData, isLoading }: Props) {
                 <line x1='10' y1='14' x2='21' y2='3' />
               </svg>
               <span className='text-xs font-medium text-brand-violet flex-1'>What to do next — Learn →</span>
-            </div>
+              <svg
+                width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#7950f2' strokeWidth='2'
+                className={`transition-transform duration-200 ${showLearn ? "rotate-180" : ""}`}>
+                <polyline points='6 9 12 15 18 9' />
+              </svg>
+            </button>
+
+            {showLearn && learnItems.length > 0 && (
+              <div className='flex flex-col gap-1.5 mt-2'>
+                {learnItems.map((item) => (
+                  <div
+                    key={item}
+                    className='flex items-start gap-2 px-3.5 py-2.5 rounded-[9px] bg-brand-bg border border-[#ddd6fe]'>
+                    <span className='text-brand-violet text-xs mt-px font-bold'>·</span>
+                    <span className='text-xs text-brand-foreground leading-relaxed'>{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
